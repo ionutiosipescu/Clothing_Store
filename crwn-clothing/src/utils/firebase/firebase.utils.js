@@ -9,13 +9,21 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  writeBatch,
+  query,
+  getDocs,
+} from "firebase/firestore";
 
 // Some parts of this file doesnt have a lot of logic, is just setup, config from documentation that we must do in order to work(1,2)
 
-
 // 1.
-// initializeApp is class to initialize with a paramter -> paramter is firebaseConfig 
+// initializeApp is class to initialize with a paramter -> paramter is firebaseConfig
 // we need to do this for create an instance for our firebase project to make CRUD actions
 
 // my firebase config to acces my specific account
@@ -48,8 +56,38 @@ export const signInWithGooglePopup = () =>
 export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
-  // 3.  db -> instanced getFirestore()
+// 3.  db -> instanced getFirestore()
 export const db = getFirestore();
+
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = collection(db, collectionKey);
+  const batch = writeBatch(db);
+
+  objectsToAdd.forEach((object) => {
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
+  });
+
+  await batch.commit();
+  console.log("done");
+};
+
+export const getCategoriesAndDocuments = async () => {
+  const collectionRef = collection(db, "categories");
+  const q = query(collectionRef)
+
+  const querySnapshot = await getDocs(q)
+  const categoryMap =  querySnapshot.docs.reduce((acc, docSnapshot) => {
+    const {title, items} = docSnapshot.data()
+    acc[title.toLowerCase()] = items
+    return acc
+  }, {})
+  return categoryMap
+};
+
 //  createUserDocumentFromAuth -> async function receive userAuth object
 export const createUserDocumentFromAuth = async (
   userAuth,
@@ -58,17 +96,17 @@ export const createUserDocumentFromAuth = async (
   if (!userAuth) return;
   // userDocRef -> doc(db(database), "users"(colection), userAuth.uid(unique ID))
   const userDocRef = doc(db, "users", userAuth.uid);
-// after we make the request and get the data response
-// we want to read that data so
-// userSnapshot async function getDoc(userDocRef(data))
+  // after we make the request and get the data response
+  // we want to read that data so
+  // userSnapshot async function getDoc(userDocRef(data))
   const userSnapshot = await getDoc(userDocRef);
-// exist verify if data exist in our database or not 
-// if not create an object for me 
+  // exist verify if data exist in our database or not
+  // if not create an object for me
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
-// use setDoc to send the object created for the user 
-// with this 3 keys and values in user data in database
+    // use setDoc to send the object created for the user
+    // with this 3 keys and values in user data in database
     try {
       await setDoc(userDocRef, {
         displayName,
@@ -80,7 +118,7 @@ export const createUserDocumentFromAuth = async (
       console.log("error creating the user", error.message);
     }
   }
-// else return userDocRef
+  // else return userDocRef
   return userDocRef;
 };
 
@@ -97,14 +135,16 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 };
 
 // sign out
-export const signOutUser = async () => await signOut(auth)
+export const signOutUser = async () => await signOut(auth);
 
 // Observer
-export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback)
+export const onAuthStateChangedListener = (callback) =>
+  onAuthStateChanged(auth, callback);
 
+// Observer Pattern
 // {
 // next:
 // error:
-// completed: 
+// completed:
 
 // }
