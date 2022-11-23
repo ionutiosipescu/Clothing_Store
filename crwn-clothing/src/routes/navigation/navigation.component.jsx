@@ -1,44 +1,44 @@
-import { Fragment, useContext } from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import { ReactComponent as CrwnLogo } from '../../assets/crown.svg';
-import { UserContext } from '../../contexts/user.context';
-import { signOutUser } from '../../utils/firebase/firebase.utils';
-import {NavigationContainer, NavLink, NavLinks, LogoContainer, } from './navigation.styles'
-import CartIcon from '../../components/cart-icon/cart-icon.component';
-import CartDropDown from '../../components/cart-dropdown/cart-dropdown.component';
-import { CartContext } from '../../contexts/cart.context';
+import { Fragment, useContext } from "react";
+import { Outlet, Link } from "react-router-dom";
+import { ReactComponent as CrwnLogo } from "../../assets/crown.svg";
+import { UserContext } from "../../contexts/user.context";
+import { signOutUser } from "../../utils/firebase/firebase.utils";
+import {
+  NavigationContainer,
+  NavLink,
+  NavLinks,
+  LogoContainer,
+} from "./navigation.styles";
+import CartIcon from "../../components/cart-icon/cart-icon.component";
+import CartDropDown from "../../components/cart-dropdown/cart-dropdown.component";
+import { CartContext } from "../../contexts/cart.context";
+import { useSelector } from "react-redux";
 
 const Navigation = () => {
-
-  const {currentUser} = useContext(UserContext)
-  const {isCartOpen} = useContext(CartContext)
-// aici putem sa vedem daca userul s-a logat ii afisam sign out daca nu sing in
-// in momentul in care userul apasa pe sign out , currentUser devine null
-// componenta se rerandeaza si ii va aparea din nou sing in 
+  const currentUser = useSelector((state) => state.user.currentUser);
+  const { isCartOpen } = useContext(CartContext);
+  // aici putem sa vedem daca userul s-a logat ii afisam sign out daca nu sing in
+  // in momentul in care userul apasa pe sign out , currentUser devine null
+  // componenta se rerandeaza si ii va aparea din nou sing in
 
   return (
     <Fragment>
       <NavigationContainer>
-        <LogoContainer to='/'>
-          <CrwnLogo className='logo' />
+        <LogoContainer to="/">
+          <CrwnLogo className="logo" />
         </LogoContainer>
         <NavLinks>
-          <NavLink to='/shop'>
-            SHOP
-          </NavLink>
-          {
-            currentUser ? (
-              <NavLink as='span' onClick={signOutUser}>SIGN OUT</NavLink>
-            ) : (
-          <NavLink to='/auth'>
-            SIGN IN
-          </NavLink>
-            )
-          }
-        <CartIcon/>
+          <NavLink to="/shop">SHOP</NavLink>
+          {currentUser ? (
+            <NavLink as="span" onClick={signOutUser}>
+              SIGN OUT
+            </NavLink>
+          ) : (
+            <NavLink to="/auth">SIGN IN</NavLink>
+          )}
+          <CartIcon />
         </NavLinks>
-        {isCartOpen && <CartDropDown/>}
-        
+        {isCartOpen && <CartDropDown />}
       </NavigationContainer>
       <Outlet />
     </Fragment>
