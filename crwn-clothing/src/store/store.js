@@ -5,21 +5,6 @@ import logger from "redux-logger";
 
 import { rootReducer } from "./root-reducer";
 
-// curring
-// loggerMiddleware este pentru a vedea in consola state-ul
-const loggerMiddleware = (store) => (next) => (action) => {
-  if (!action.type) {
-    return next(action);
-  }
-
-  console.log("type", action.type);
-  console.log("payload", action.payload);
-  console.log("currentState", store.getState());
-
-  next(action);
-
-  console.log("next state: ", store.getState());
-};
 // localstorage config
 const persistConfig = {
   key: "root",
@@ -29,7 +14,23 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const middleWares = [loggerMiddleware];
+// Before
+// pentru a vedea state-ul in consola
+// const middleWares = [logger]
+// After
+// vedem state-ul in consola + isi da seama daca esti in developer mode sau production
+// pentru a activa acest logger
+const middleWares = [process.env.NODE_ENV !== "production" && logger].filter(
+  Boolean
+);
+
+// verifica in ce envaroment esti si iti permite sa folosesti redux extension din crome
+// optional
+const composeEnhancer =
+  (process.env.NODE_ENV !== "production" &&
+    window &&
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
+  compose;
 
 const composedEnhancers = compose(applyMiddleware(...middleWares));
 
