@@ -24,4 +24,8 @@ export const selectCategoriesMap = createSelector(
     }, {})
 );
 
+export const selectIsLoading = createSelector(
+  [selectCategoryReducer],
+  (categoriesSlice) => categoriesSlice.isLoading
+);
 // problema era ca toate useSelectorii se rerandau cand se schimba un state
