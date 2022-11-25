@@ -11,7 +11,6 @@ import {
 import { selectIsCartOpen } from "../../store/cart/cart.selector";
 import CartIcon from "../../components/cart-icon/cart-icon.component";
 import CartDropDown from "../../components/cart-dropdown/cart-dropdown.component";
-// import { CartContext } from "../../contexts/cart.context";
 import { useSelector } from "react-redux";
 
 const Navigation = () => {
