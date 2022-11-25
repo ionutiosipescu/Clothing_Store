@@ -1,24 +1,29 @@
 import { Fragment } from "react";
 import { Outlet } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+
+import CartIcon from "../../components/cart-icon/cart-icon.component";
+import CartDropdown from "../../components/cart-dropdown/cart-dropdown.component";
+
+import { selectIsCartOpen } from "../../store/cart/cart.selector";
+import { selectCurrentUser } from "../../store/user/user.selector";
+import { signOutStart } from "../../store/user/user.action";
+
 import { ReactComponent as CrwnLogo } from "../../assets/crown.svg";
-import { signOutUser } from "../../utils/firebase/firebase.utils";
+
 import {
   NavigationContainer,
-  NavLink,
   NavLinks,
+  NavLink,
   LogoContainer,
 } from "./navigation.styles";
-import { selectIsCartOpen } from "../../store/cart/cart.selector";
-import CartIcon from "../../components/cart-icon/cart-icon.component";
-import CartDropDown from "../../components/cart-dropdown/cart-dropdown.component";
-import { useSelector } from "react-redux";
 
 const Navigation = () => {
-  const currentUser = useSelector((state) => state.user.currentUser);
+  const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
   const isCartOpen = useSelector(selectIsCartOpen);
-  // aici putem sa vedem daca userul s-a logat ii afisam sign out daca nu sing in
-  // in momentul in care userul apasa pe sign out , currentUser devine null
-  // componenta se rerandeaza si ii va aparea din nou sing in
+
+  const signOutUser = () => dispatch(signOutStart());
 
   return (
     <Fragment>
@@ -28,6 +33,7 @@ const Navigation = () => {
         </LogoContainer>
         <NavLinks>
           <NavLink to="/shop">SHOP</NavLink>
+
           {currentUser ? (
             <NavLink as="span" onClick={signOutUser}>
               SIGN OUT
@@ -37,7 +43,7 @@ const Navigation = () => {
           )}
           <CartIcon />
         </NavLinks>
-        {isCartOpen && <CartDropDown />}
+        {isCartOpen && <CartDropdown />}
       </NavigationContainer>
       <Outlet />
     </Fragment>
